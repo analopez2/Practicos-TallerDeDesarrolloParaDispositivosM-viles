@@ -1,0 +1,75 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script>
+      window.onload = function () {
+        document.getElementById("id_btn").onclick = function () {
+          let ciudad = document.getElementById("id_ciu").value;
+          let pais = document.getElementById("slc_pais").value;
+          let canDias = document.getElementById("id_dia").value;
+
+          try {
+            if (!ciudad) {
+              throw "Ciuadad es requerido para continuar";
+            }
+            if (!pais) {
+              throw "País es requerido para continuar";
+            }
+            if (!canDias) {
+              throw "Camtidad de días es requerido para continuar";
+            }
+
+            function mostrar_datos(datos) {
+                
+              document.getElementById("info").innerHTML = "";
+
+              datos.list.forEach((tiempo) => {
+                document.getElementById(
+                  "info"
+                ).innerHTML += `<p>Temperatura actual: ${tiempo.temp.day}</p> 
+                <p>Temperatura mínima: ${tiempo.temp.min}</p>
+                <p>Temperatura máxima: ${tiempo.temp.max}</p>
+                <p>${tiempo.weather[0].description}</p>
+                <p><img src="http://openweathermap.com/img/w/${tiempo.weather[0].icon}.png" alt="image"></p>`;
+              });
+            }
+
+            fetch(
+              `http://api.openweathermap.org/data/2.5/forecast/daily?appid=e62b2530fdb5f4ba3559c07c8634e5c7&lang=es&units=metric&q=${ciudad},${pais}&cnt=${canDias}`
+            )
+              .then((respuesta) => respuesta.json())
+              .then((datos_json) => mostrar_datos(datos_json));
+          } catch (e) {
+            alert(e);
+          }
+        };
+      };
+    </script>
+  </head>
+  <body>
+    <h1>Prónostico Semanal</h1>
+
+    <label for="id_ciu">Ciudad</label>
+
+    <input type="text" id="id_ciu" />
+
+    <label for="slc_pais">País</label>
+
+    <select id="slc_pais">
+      <option value="uy">Uruguay</option>
+      <option value="ar">Argentina</option>
+      <option value="br">Brasil</option>
+    </select>
+
+    <label for="id_dia">Cantidad días</label>
+
+    <input type="number" id="id_dia" />
+
+    <input type="button" id="id_btn" value="Consultar" />
+
+    <div id="info"></div>
+  </body>
+</html>

@@ -1,0 +1,63 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <script>
+      window.onload = function () {
+        document.getElementById("id_btn").onclick = function () {
+          let ciudad = document.getElementById("id_ciu").value;
+          let pais = document.getElementById("slc_pais").value;
+
+          try {
+            if (!ciudad) {
+              throw "Ciuadad es requerido para continuar";
+            }
+            if (!pais) {
+              throw "País es requerido para continuar";
+            }
+
+            function mostrar_datos(datos) {
+              document.getElementById(
+                "info"
+              ).innerHTML = `<p>Temperatura actual: ${datos.main.temp}</p> 
+              <p>${datos.weather[0].description}</p>
+              <p>Temperatura mínima: ${datos.main.temp_min}</p>
+              <p>Temperatura máxima: ${datos.main.temp_max}</p>
+              <p><img src="http://openweathermap.com/img/w/${datos.weather[0].icon}.png" alt="image"></p>`;
+            }
+
+            fetch(
+              `http://api.openweathermap.org/data/2.5/weather/?appid=e62b2530fdb5f4ba3559c07c8634e5c7&lang=es&units=metric&q=${ciudad},${pais}`
+            )
+              .then((respuesta) => respuesta.json())
+              .then((datos_json) => mostrar_datos(datos_json));
+          } catch (e) {
+            alert(e);
+          }
+        };
+      };
+    </script>
+  </head>
+  <body>
+    <h1>Prónostico Diario</h1>
+
+    <label for="id_ciu">Ciudad</label>
+
+    <input type="text" id="id_ciu" />
+
+    <label for="slc_pais">País</label>
+
+    <select id="slc_pais">
+      <option value="uy">Uruguay</option>
+      <option value="ar">Argentina</option>
+      <option value="br">Brasil</option>
+    </select>
+
+    <input type="button" id="id_btn" value="Consultar" />
+
+    <div id="info"></div>
+  </body>
+</html>

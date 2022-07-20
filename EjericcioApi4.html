@@ -1,0 +1,78 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+    integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+    crossorigin=""/>
+    <script>
+      var map;
+      window.onload = function () {
+        document.getElementById("id_btn").onclick = function () {
+          let calle = document.getElementById("id_calle").value;
+          let numero = document.getElementById("id_numero").value;
+
+          if(!calle){
+            throw "La calle es obligatoria";
+          }
+
+          if(!numero) {
+            throw "El número es obligatorio";
+          }
+
+          function crearMapa(data){
+            let latitud = data.results[0].locations[0].latLng.lat;
+            let longitud = data.results[0].locations[0].latLng.lng;
+
+            if(map != undefined){
+              map.remove();
+            }
+            
+            map = L.map('map').setView([latitud, longitud], 19);
+
+            marker = L.marker([latitud, longitud]).addTo(map);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            var popup = L.popup({
+                            offset: [0, -30]
+                        })
+                        .setLatLng([latitud, longitud])
+                        .setContent(`${calle} ${numero}`)
+                        .openOn(map);
+          }
+
+          try {
+            let url = `http://open.mapquestapi.com/geocoding/v1/address?key=9gKsksY2ywWcC0WM0kWLTUIvnof5qtez&location=${calle},${numero},Montevideo,Uruguay`;
+            fetch(url)
+              .then((respuesta) => respuesta.json())
+              .then((datos_json) => crearMapa(datos_json));
+          } catch (e) {
+            alert(e);
+          }
+        };
+      };
+    </script>
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+    integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+    crossorigin=""></script>
+  </head>
+
+  <body>
+    <h1>App localización de direcciones</h1>
+    <label for="id_calle">Ingrese nombre de calle:</label>
+    <input type="text" id="id_calle">
+
+    <label for="id_numero">Ingrese número de puerto:</label>
+    <input type="text" id="id_numero">
+
+    <input type="button" id="id_btn" value="Consultar" />
+
+    <div id="map" style="height: 400px"></div>
+  </body>
+</html>
